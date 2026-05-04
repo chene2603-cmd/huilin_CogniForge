@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coastal-console"
+version = "0.1.0"
+description = "CogniForge 可生长知识引擎"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "jinja2>=3.1.0",
+    "pymupdf>=1.23.0",
+    "markdown>=3.4.0",
+    "pyyaml>=6.0",
+    "python-dateutil>=2.8.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "isort", "mypy", "flake8", "bandit"]
+docker = ["docker"]
+ai = ["openai", "sentence-transformers", "spacy"]
+db = ["sqlalchemy", "alembic", "redis", "chromadb"]
+knowledge = ["rdflib", "networkx"]
+
+[project.scripts]
+coastal = "coastal.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/chene2603-cmd/huilin_CogniForge"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["coastal*", "engine*"]
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
