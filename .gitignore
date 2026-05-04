@@ -44,5 +44,5 @@ backups/
 exports/
 
 # 🔒 核心私有代码（永不提交到公开仓库）
-coastal/engine/dna_analyzer.py
+coastal/engine/core.py
 coastal/engine/private/
