@@ -1,0 +1,189 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coastal-console"
+version = "1.0.0"
+description = "🌊 Coastal Console - 基于DNA四维分析思想的可生长知识引擎"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "CogniForge Team", email = "contact@cogniforge.org"}
+]
+maintainers = [
+    {name = "Yuanbao", email = "yuanbao@tencent.com"}
+]
+keywords = [
+    "knowledge-management", 
+    "ai", 
+    "nlp", 
+    "data-analysis", 
+    "self-evolving"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "jinja2>=3.1.0",
+    "pymupdf>=1.23.0",
+    "markdown>=3.4.0",
+    "pyyaml>=6.0",
+    "python-dateutil>=2.8.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+ai = [
+    "openai>=1.0.0",
+    "anthropic>=0.7.0",
+    "transformers>=4.35.0",
+    "torch>=2.1.0",
+]
+vector = [
+    "chromadb>=0.4.0",
+    "qdrant-client>=1.6.0",
+]
+full = [
+    "coastal-console[ai]",
+    "coastal-console[vector]",
+    "pandas>=2.0.0",
+    "sqlalchemy>=2.0.0",
+    "redis>=5.0.0",
+    "celery>=5.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/cogniforge/coastal-console"
+Documentation = "https://coastal.example.com/docs"
+Repository = "https://github.com/cogniforge/coastal-console"
+Issues = "https://github.com/cogniforge/coastal-console/issues"
+
+[project.scripts]
+coastal = "coastal.cli:main"
+
+[project.entry-points."coastal.plugins"]
+web_importer = "coastal.plugins.web_importer:WebImporter"
+pdf_processor = "coastal.plugins.pdf_processor:PDFProcessor"
+notion_sync = "coastal.plugins.notion_sync:NotionSync"
+
+[tool.setuptools]
+packages = ["coastal", "coastal.*"]
+
+[tool.setuptools.package-data]
+coastal = [
+    "templates/*.html",
+    "static/**/*",
+    "plugins/*.py",
+    "*.json",
+    "*.md",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+lines_after_imports = 2
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--tb=short",
+    "--cov=coastal",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: integration tests",
+    "e2e: end-to-end tests",
+]
+
+[tool.coverage.run]
+source = ["coastal"]
+omit = [
+    "coastal/tests/*",
+    "coastal/*/tests/*",
+    "coastal/cli.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
