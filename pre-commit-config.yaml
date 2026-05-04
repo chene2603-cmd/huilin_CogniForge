@@ -1,0 +1,190 @@
+# 🌊 Coastal Console 预提交钩子配置
+# 基于DNA四维分析思想的可生长知识引擎
+
+repos:
+  # 通用钩子
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ['--maxkb=1024']
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: name-tests-test
+        args: ['--pytest-test-first']
+      - id: requirements-txt-fixer
+
+  # Python格式化
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3
+        args: ['--line-length=88', '--target-version=py38']
+
+  # 导入排序
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile=black', '--line-length=88']
+
+  # Python代码检查
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+          - pep8-naming
+        args: ['--max-line-length=88', '--extend-ignore=E203,W503']
+
+  # 类型检查
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-all
+          - sqlalchemy-stubs
+        args: ['--ignore-missing-imports', '--strict']
+
+  # 安全检查
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml']
+
+  # 依赖安全检查
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml']
+
+  # 自动修复导入
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v2.3.0
+    hooks:
+      - id: pycln
+        args: [--all]
+
+  # 文档字符串检查
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        args: ['--convention=google', '--add-ignore=D100,D104,D107']
+
+  # 自动更新版权声明
+  - repo: https://github.com/snakemake/snakefmt
+    rev: 0.9.0
+    hooks:
+      - id: snakefmt
+        files: ^workflow/.*\.smk$
+
+  # Markdown格式化
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.17
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-frontmatter
+          - mdformat-footnote
+        args: ['--number']
+
+  # Shell脚本检查
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        args: ['--severity=warning']
+
+  # YAML检查
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: ['-c', '.yamllint.yml']
+
+  # Dockerfile检查
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
+        args: ['--failure-threshold', 'warning']
+
+  # JSON检查
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types: [json]
+        args: ['--write']
+
+  # 提交消息检查
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.6.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]
+        additional_dependencies: ['@commitlint/config-conventional']
+
+  # 测试运行
+  - repo: local
+    hooks:
+      - id: pytest-check
+        name: Run pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [push]
+
+  # 覆盖率检查
+  - repo: local
+    hooks:
+      - id: coverage-check
+        name: Check test coverage
+        entry: bash -c 'pytest --cov=coastal --cov-fail-under=80 --cov-report=term-missing || exit 1'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [push]
+
+# 全局排除
+exclude: |
+  (?x)^(
+    .*/migrations/.*\.py$|
+    .*\.min\.(css|js)$|
+    .*\.(woff|woff2|eot|ttf|otf|svg)$|
+    .*\.(jpg|jpeg|png|gif|ico)$|
+    .*\.(pdf|doc|docx|xls|xlsx)$|
+    .*\.(mp4|mp3|wav|ogg)$|
+    ^tests/fixtures/.*$|
+    ^\.venv/.*$|
+    ^node_modules/.*$|
+    ^build/.*$|
+    ^dist/.*$|
+    ^\.git/.*$|
+    ^\.tox/.*$|
+    ^__pycache__/.*$
+  )$
+
+# 默认阶段
+default_stages: [commit]
+
+# 最低版本
+minimum_pre_commit_version: 2.9.0
