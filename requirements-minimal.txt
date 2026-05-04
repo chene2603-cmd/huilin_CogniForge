@@ -1,0 +1,11 @@
+# 📦 最小化依赖（核心功能）
+typer>=0.9.0
+rich>=13.0.0
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+jinja2>=3.1.0
+pymupdf>=1.23.0
+markdown>=3.4.0
+pyyaml>=6.0
+python-dateutil>=2.8.0
+python-dotenv>=1.0.0
