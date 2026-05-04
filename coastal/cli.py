@@ -637,4 +637,4 @@ def _display_evolution_report(results: list, dry_run: bool = False):
         
         content = []
         
-        if improvements:
+        
