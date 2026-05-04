@@ -237,7 +237,7 @@ def init(
         
         # 创建README示例
         readme_content = f"""# {project_name} 知识库
-        
+
 ## 项目概述
 这是由Coastal Console自动创建的知识库。
 
@@ -1335,282 +1335,282 @@ def _create_web_templates(self, templates_dir: Path, theme: Theme):
     
     # 创建CSS文件
     css_content = f"""
-    :root {{
-        --bg-color: {colors['bg']};
-        --text-color: {colors['text']};
-        --primary-color: {colors['primary']};
-        --secondary-color: {colors['secondary']};
-    }}
-    
-    * {{
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }}
-    
-    body {{
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        line-height: 1.6;
-    }}
-    
-    .container {{
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-    }}
-    
-    .header {{
-        text-align: center;
-        padding: 2rem 0;
-        border-bottom: 2px solid var(--primary-color);
-        margin-bottom: 2rem;
-    }}
-    
-    .header h1 {{
-        color: var(--primary-color);
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-    }}
-    
-    .header .subtitle {{
-        color: var(--secondary-color);
-        opacity: 0.8;
-    }}
-    
-    .stats-grid {{
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }}
-    
-    .stat-card {{
-        background: rgba(255, 255, 255, 0.05);
-        padding: 1.5rem;
-        border-radius: 8px;
-        border-left: 4px solid var(--primary-color);
-    }}
-    
-    .stat-card h3 {{
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 0.5rem;
-        opacity: 0.7;
-    }}
-    
-    .stat-card .value {{
-        font-size: 2rem;
-        font-weight: bold;
-        color: var(--primary-color);
-    }}
-    
+:root {{
+    --bg-color: {colors['bg']};
+    --text-color: {colors['text']};
+    --primary-color: {colors['primary']};
+    --secondary-color: {colors['secondary']};
+}}
+
+* {{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}}
+
+body {{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}}
+
+.container {{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}}
+
+.header {{
+    text-align: center;
+    padding: 2rem 0;
+    border-bottom: 2px solid var(--primary-color);
+    margin-bottom: 2rem;
+}}
+
+.header h1 {{
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}}
+
+.header .subtitle {{
+    color: var(--secondary-color);
+    opacity: 0.8;
+}}
+
+.stats-grid {{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}}
+
+.stat-card {{
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}}
+
+.stat-card h3 {{
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+}}
+
+.stat-card .value {{
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}}
+
+.content {{
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}}
+
+@media (max-width: 768px) {{
     .content {{
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
+        grid-template-columns: 1fr;
     }}
-    
-    @media (max-width: 768px) {{
-        .content {{
-            grid-template-columns: 1fr;
-        }}
-    }}
-    
-    .main-content {{
-        background: rgba(255, 255, 255, 0.05);
-        padding: 1.5rem;
-        border-radius: 8px;
-    }}
-    
-    .sidebar {{
-        background: rgba(255, 255, 255, 0.05);
-        padding: 1.5rem;
-        border-radius: 8px;
-    }}
-    
-    .btn {{
-        display: inline-block;
-        background: var(--primary-color);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        transition: opacity 0.3s;
-    }}
-    
-    .btn:hover {{
-        opacity: 0.9;
-    }}
-    
-    .btn-secondary {{
-        background: var(--secondary-color);
-    }}
-    """
+}}
+
+.main-content {{
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+}}
+
+.sidebar {{
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+}}
+
+.btn {{
+    display: inline-block;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}}
+
+.btn:hover {{
+    opacity: 0.9;
+}}
+
+.btn-secondary {{
+    background: var(--secondary-color);
+}}
+"""
     
     (templates_dir / "static" / "css").mkdir(parents=True, exist_ok=True)
     (templates_dir / "static" / "css" / "style.css").write_text(css_content, encoding="utf-8")
     
     # 创建HTML模板
     html_content = """
-    <!DOCTYPE html>
-    <html lang="zh-CN">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ title }}</title>
-        <link rel="stylesheet" href="/static/css/style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </head>
-    <body>
-        <div class="container">
-            <header class="header">
-                <h1><i class="fas fa-water"></i> Coastal Console</h1>
-                <p class="subtitle">基于DNA四维分析思想的智能知识引擎</p>
-            </header>
-            
-            <div class="stats-grid" id="stats">
-                <div class="stat-card">
-                    <h3><i class="fas fa-file-alt"></i> 知识文档</h3>
-                    <div class="value" id="doc-count">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3><i class="fas fa-brain"></i> 分析次数</h3>
-                    <div class="value" id="analysis-count">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3><i class="fas fa-code-branch"></i> 进化轮数</h3>
-                    <div class="value" id="evolution-count">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3><i class="fas fa-project-diagram"></i> 关联数量</h3>
-                    <div class="value" id="connection-count">0</div>
-                </div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-water"></i> Coastal Console</h1>
+            <p class="subtitle">基于DNA四维分析思想的智能知识引擎</p>
+        </header>
+        
+        <div class="stats-grid" id="stats">
+            <div class="stat-card">
+                <h3><i class="fas fa-file-alt"></i> 知识文档</h3>
+                <div class="value" id="doc-count">0</div>
             </div>
-            
-            <div class="content">
-                <main class="main-content">
-                    <h2><i class="fas fa-tachometer-alt"></i> 控制面板</h2>
-                    
-                    <div style="margin: 1.5rem 0;">
-                        <button class="btn" onclick="analyzeText()">
-                            <i class="fas fa-search"></i> 快速分析
-                        </button>
-                        <button class="btn btn-secondary" onclick="viewKnowledge()">
-                            <i class="fas fa-book"></i> 查看知识库
-                        </button>
-                        <button class="btn" onclick="startEvolution()">
-                            <i class="fas fa-sync-alt"></i> 开始进化
-                        </button>
-                    </div>
-                    
-                    <div id="analysis-result" style="margin-top: 2rem;"></div>
-                    
-                    <h3 style="margin-top: 2rem;"><i class="fas fa-history"></i> 最近活动</h3>
-                    <div id="recent-activity"></div>
-                </main>
-                
-                <aside class="sidebar">
-                    <h3><i class="fas fa-info-circle"></i> 系统信息</h3>
-                    <div id="system-info"></div>
-                    
-                    <h3 style="margin-top: 2rem;"><i class="fas fa-bolt"></i> 快速操作</h3>
-                    <div style="margin-top: 1rem;">
-                        <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="uploadDocument()">
-                            <i class="fas fa-upload"></i> 上传文档
-                        </button>
-                        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" onclick="selfAnalyze()">
-                            <i class="fas fa-eye"></i> 自我分析
-                        </button>
-                        <button class="btn" style="width: 100%;" onclick="exportData()">
-                            <i class="fas fa-download"></i> 导出数据
-                        </button>
-                    </div>
-                    
-                    <h3 style="margin-top: 2rem;"><i class="fas fa-question-circle"></i> 帮助</h3>
-                    <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
-                        使用 <code>coastal --help</code> 查看所有命令<br>
-                        查看文档: <a href="#" style="color: var(--primary-color);">https://coastal.example.com</a>
-                    </p>
-                </aside>
+            <div class="stat-card">
+                <h3><i class="fas fa-brain"></i> 分析次数</h3>
+                <div class="value" id="analysis-count">0</div>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-code-branch"></i> 进化轮数</h3>
+                <div class="value" id="evolution-count">0</div>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-project-diagram"></i> 关联数量</h3>
+                <div class="value" id="connection-count">0</div>
             </div>
         </div>
         
-        <script>
-            // 加载系统状态
-            async function loadSystemStatus() {
-                try {
-                    const response = await fetch('/api/status');
-                    const data = await response.json();
-                    
-                    document.getElementById('doc-count').textContent = '...';
-                    document.getElementById('analysis-count').textContent = data.analysis_count || 0;
-                    document.getElementById('evolution-count').textContent = data.evolution_count || 0;
-                    document.getElementById('connection-count').textContent = '...';
-                    
-                    // 显示系统信息
-                    const systemInfo = document.getElementById('system-info');
-                    systemInfo.innerHTML = `
-                        <p><strong>版本:</strong> ${data.version || '1.0.0'}</p>
-                        <p><strong>状态:</strong> <span style="color: #10b981;">● 运行中</span></p>
-                        <p><strong>服务:</strong> ${data.system || 'Coastal Console'}</p>
-                    `;
-                    
-                } catch (error) {
-                    console.error('加载状态失败:', error);
-                }
-            }
-            
-            // 分析文本
-            async function analyzeText() {
-                const text = prompt('请输入要分析的文本:', '');
-                if (!text) return;
+        <div class="content">
+            <main class="main-content">
+                <h2><i class="fas fa-tachometer-alt"></i> 控制面板</h2>
                 
-                const resultDiv = document.getElementById('analysis-result');
-                resultDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> 分析中...</p>';
+                <div style="margin: 1.5rem 0;">
+                    <button class="btn" onclick="analyzeText()">
+                        <i class="fas fa-search"></i> 快速分析
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewKnowledge()">
+                        <i class="fas fa-book"></i> 查看知识库
+                    </button>
+                    <button class="btn" onclick="startEvolution()">
+                        <i class="fas fa-sync-alt"></i> 开始进化
+                    </button>
+                </div>
                 
-                try {
-                    const response = await fetch('/api/analyze', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ text: text, content_type: 'auto' })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    resultDiv.innerHTML = `
-                        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
-                            <h4><i class="fas fa-chart-bar"></i> 分析结果</h4>
-                            <p><strong>类型:</strong> ${data.type || '未知'}</p>
-                            <p><strong>深度:</strong> ${data.depth || 0}</p>
-                            <p><strong>时间:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
-                        </div>
-                    `;
-                    
-                } catch (error) {
-                    resultDiv.innerHTML = '<p style="color: #ef4444;">分析失败</p>';
-                }
+                <div id="analysis-result" style="margin-top: 2rem;"></div>
+                
+                <h3 style="margin-top: 2rem;"><i class="fas fa-history"></i> 最近活动</h3>
+                <div id="recent-activity"></div>
+            </main>
+            
+            <aside class="sidebar">
+                <h3><i class="fas fa-info-circle"></i> 系统信息</h3>
+                <div id="system-info"></div>
+                
+                <h3 style="margin-top: 2rem;"><i class="fas fa-bolt"></i> 快速操作</h3>
+                <div style="margin-top: 1rem;">
+                    <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="uploadDocument()">
+                        <i class="fas fa-upload"></i> 上传文档
+                    </button>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" onclick="selfAnalyze()">
+                        <i class="fas fa-eye"></i> 自我分析
+                    </button>
+                    <button class="btn" style="width: 100%;" onclick="exportData()">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                </div>
+                
+                <h3 style="margin-top: 2rem;"><i class="fas fa-question-circle"></i> 帮助</h3>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+                    使用 <code>coastal --help</code> 查看所有命令<br>
+                    查看文档: <a href="#" style="color: var(--primary-color);">https://coastal.example.com</a>
+                </p>
+            </aside>
+        </div>
+    </div>
+    
+    <script>
+        // 加载系统状态
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                document.getElementById('doc-count').textContent = '...';
+                document.getElementById('analysis-count').textContent = data.analysis_count || 0;
+                document.getElementById('evolution-count').textContent = data.evolution_count || 0;
+                document.getElementById('connection-count').textContent = '...';
+                
+                // 显示系统信息
+                const systemInfo = document.getElementById('system-info');
+                systemInfo.innerHTML = `
+                    <p><strong>版本:</strong> ${data.version || '1.0.0'}</p>
+                    <p><strong>状态:</strong> <span style="color: #10b981;">● 运行中</span></p>
+                    <p><strong>服务:</strong> ${data.system || 'Coastal Console'}</p>
+                `;
+                
+            } catch (error) {
+                console.error('加载状态失败:', error);
             }
+        }
+        
+        // 分析文本
+        async function analyzeText() {
+            const text = prompt('请输入要分析的文本:', '');
+            if (!text) return;
             
-            // 加载页面时初始化
-            document.addEventListener('DOMContentLoaded', loadSystemStatus);
+            const resultDiv = document.getElementById('analysis-result');
+            resultDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> 分析中...</p>';
             
-            // 其他函数占位
-            function viewKnowledge() { alert('知识库功能开发中...'); }
-            function startEvolution() { alert('进化功能开发中...'); }
-            function uploadDocument() { alert('上传功能开发中...'); }
-            function selfAnalyze() { alert('自我分析功能开发中...'); }
-            function exportData() { alert('导出功能开发中...'); }
-        </script>
-    </body>
-    </html>
-    """
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text, content_type: 'auto' })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                        <h4><i class="fas fa-chart-bar"></i> 分析结果</h4>
+                        <p><strong>类型:</strong> ${data.type || '未知'}</p>
+                        <p><strong>深度:</strong> ${data.depth || 0}</p>
+                        <p><strong>时间:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = '<p style="color: #ef4444;">分析失败</p>';
+            }
+        }
+        
+        // 加载页面时初始化
+        document.addEventListener('DOMContentLoaded', loadSystemStatus);
+        
+        // 其他函数占位
+        function viewKnowledge() { alert('知识库功能开发中...'); }
+        function startEvolution() { alert('进化功能开发中...'); }
+        function uploadDocument() { alert('上传功能开发中...'); }
+        function selfAnalyze() { alert('自我分析功能开发中...'); }
+        function exportData() { alert('导出功能开发中...'); }
+    </script>
+</body>
+</html>
+"""
     
     (templates_dir / "index.html").write_text(html_content, encoding="utf-8")
 
@@ -1737,56 +1737,4 @@ def docs(
                     print()
                 
                 if "example" in doc:
-                    print(f"## 示例\n```bash\n{doc['example']}\n```")
-            else:
-                # 终端格式
-                console.print(f"\n[bold cyan]coastal {command}[/]")
-                console.print(f"[white]{doc['description']}[/]\n")
-                console.print(f"[yellow]使用方法:[/] {doc['usage']}\n")
-                
-                if "options" in doc and doc["options"]:
-                    console.print("[green]选项:[/]")
-                    for opt, desc in doc["options"].items():
-                        console.print(f"  [cyan]{opt:30}[/] {desc}")
-                    console.print()
-                
-                if "example" in doc:
-                    console.print(f"[green]示例:[/]")
-                    console.print(f"  [dim]$[/] {doc['example']}")
-        else:
-            console.print(f"[red]❌ 未知命令: {command}[/]")
-            console.print("[yellow]可用命令:[/] " + ", ".join(commands_docs.keys()))
-    else:
-        # 显示所有命令
-        if markdown:
-            print("# Coastal Console 文档\n")
-            print("## 命令列表\n")
-            for cmd, doc in commands_docs.items():
-                print(f"### `coastal {cmd}`\n")
-                print(f"{doc['description']}\n")
-                print(f"```bash\n{doc['usage']}\n```\n")
-        else:
-            show_banner()
-            console.print("[bold cyan]📖 命令文档[/]\n")
-            console.print("[yellow]使用方法: coastal <命令> [选项] [参数][/]\n")
-            
-            for cmd, doc in commands_docs.items():
-                console.print(f"[bold cyan]  {cmd:15}[/] {doc['description']}")
-            
-            console.print("\n[yellow]查看具体命令文档:[/] coastal docs <命令>")
-            console.print("[yellow]例如:[/] coastal docs analyze")
-
-def main():
-    """主函数"""
-    try:
-        app()
-    except KeyboardInterrupt:
-        console.print("\n[yellow]👋 再见![/]")
-        sys.exit(0)
-    except Exception as e:
-        logger.log(f"程序错误: {e}", LogLevel.ERROR, "Main")
-        console.print(f"[red]❌ 错误: {e}[/]")
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
+                    print(f"## 示例\n```
