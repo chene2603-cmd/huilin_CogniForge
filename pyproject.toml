@@ -5,22 +5,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "coastal-console"
 version = "0.1.0"
-description = "CogniForge 可生长知识引擎 - 基于DNA四维分析思想的自进化知识管理系统"
+description = "CogniForge 可生长知识引擎"
 readme = "README.md"
 license = {text = "MIT"}
-authors = [
-    {name = "Your Name", email = "you@example.com"}
-]
-classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-]
 requires-python = ">=3.8"
 dependencies = [
     "typer>=0.9.0",
@@ -36,43 +23,17 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "black>=23.0",
-    "isort>=5.12",
-    "mypy>=1.0",
-    "flake8>=6.0",
-    "bandit>=1.7",
-    "pre-commit>=3.0",
-]
-docker = [
-    "docker>=6.0",
-]
-ai = [
-    "openai>=1.3.0",
-    "sentence-transformers>=2.2.0",
-    "spacy>=3.7.0",
-]
-db = [
-    "sqlalchemy>=2.0.0",
-    "alembic>=1.12.0",
-    "redis>=5.0.0",
-    "chromadb>=0.4.0",
-]
-knowledge = [
-    "rdflib>=7.0.0",
-    "networkx>=3.0",
-]
-all = [
-    "coastal-console[dev,ai,db,knowledge]",
-]
+dev = ["pytest", "black", "isort", "mypy", "flake8", "bandit"]
+docker = ["docker"]
+ai = ["openai", "sentence-transformers", "spacy"]
+db = ["sqlalchemy", "alembic", "redis", "chromadb"]
+knowledge = ["rdflib", "networkx"]
 
 [project.scripts]
 coastal = "coastal.cli:app"
 
 [project.urls]
 Homepage = "https://github.com/chene2603-cmd/huilin_CogniForge"
-Repository = "https://github.com/chene2603-cmd/huilin_CogniForge.git"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -80,7 +41,6 @@ include = ["coastal*", "engine*"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310', 'py311']
 
 [tool.isort]
 profile = "black"
@@ -88,8 +48,3 @@ profile = "black"
 [tool.mypy]
 python_version = "3.10"
 ignore_missing_imports = true
-strict = true
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-v --tb=short"
