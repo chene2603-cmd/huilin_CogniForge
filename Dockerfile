@@ -4,7 +4,7 @@
 
 # 多阶段构建
 # 阶段1: 构建阶段
-FROM python:3.9-slim as builder
+FROM python:3.9-slim AS builder
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 复制依赖文件
-COPY requirements.txt requirements-minimal.txt ./
+COPY requirements.txt .
 
 # 创建虚拟环境并安装依赖
 RUN python -m venv /opt/venv
@@ -35,7 +35,7 @@ COPY . .
 RUN pip install -e .
 
 # 阶段2: 运行阶段
-FROM python:3.9-slim
+FROM python:3.9-slim AS runtime
 
 LABEL maintainer="CogniForge Team <contact@cogniforge.org>"
 LABEL description="🌊 Coastal Console - 基于DNA四维分析思想的可生长知识引擎"
