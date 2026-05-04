@@ -1,0 +1,343 @@
+# 🌊 Coastal Console CI/CD 工作流
+# 基于DNA四维分析思想的可生长知识引擎
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main, develop]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # 代码质量检查
+  quality:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+
+    - name: Lint with flake8
+      run: |
+        flake8 coastal tests --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 coastal tests --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+
+    - name: Check code formatting
+      run: |
+        black --check coastal tests
+        isort --check-only coastal tests
+
+    - name: Type checking with mypy
+      run: |
+        mypy coastal --ignore-missing-imports --strict
+
+    - name: Security check with bandit
+      run: |
+        bandit -r coastal -c pyproject.toml
+
+  # 测试
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: coastal
+          POSTGRES_PASSWORD: coastal
+          POSTGRES_DB: coastal_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+
+    - name: Wait for database
+      run: |
+        sleep 5
+
+    - name: Run tests
+      env:
+        DATABASE_URL: postgresql://coastal:coastal@localhost:5432/coastal_test
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        pytest -v --cov=coastal --cov-report=xml --cov-report=html
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.python-version }}
+        path: |
+          htmlcov/
+          test-results.xml
+        retention-days: 7
+
+  # 构建和测试Docker镜像
+  docker:
+    runs-on: ubuntu-latest
+    needs: [quality, test]
+    if: github.event_name == 'push'
+
+    steps:
+    - uses: actions/checkout@4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: ${{ github.event_name == 'push' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Test Docker image
+      run: |
+        docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} coastal --version
+        docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} coastal self-analyze
+
+  # 发布到PyPI
+  publish:
+    runs-on: ubuntu-latest
+    needs: [quality, test, docker]
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - uses: actions/checkout@4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+
+    - name: Build package
+      run: |
+        python -m build
+
+    - name: Check package
+      run: |
+        twine check dist/*
+
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        twine upload dist/*
+
+  # 发布文档
+  docs:
+    runs-on: ubuntu-latest
+    needs: [quality, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[docs]"
+
+    - name: Build documentation
+      run: |
+        sphinx-build -b html docs/source docs/build
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/build
+        force_orphan: true
+
+  # 安全扫描
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Run Semgrep
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: p/ci
+
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+        extra_args: --regex
+
+  # 性能测试
+  performance:
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    services:
+      coastal:
+        image: ghcr.io/${{ github.repository }}:latest
+        env:
+          DATABASE_URL: postgresql://coastal:coastal@localhost:5432/coastal_perf
+          REDIS_URL: redis://localhost:6379/0
+        ports:
+          - 8000:8000
+
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: coastal
+          POSTGRES_PASSWORD: coastal
+          POSTGRES_DB: coastal_perf
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@4
+
+    - name: Wait for services
+      run: |
+        sleep 10
+        curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:8000/api/status
+
+    - name: Run performance tests
+      run: |
+        pip install locust
+        locust -f tests/performance/locustfile.py --headless -u 10 -r 1 -t 30s --host=http://localhost:8000
+
+    - name: Upload performance report
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-report
+        path: locust-report.html
+        retention-days: 7
+
+  # 通知
+  notify:
+    runs-on: ubuntu-latest
+    needs: [quality, test, docker, publish, docs, security, performance]
+    if: always()
+
+    steps:
+    - name: Success notification
+      if: success()
+      run: |
+        echo "🎉 所有检查通过！"
+
+    - name: Failure notification
+      if: failure()
+      run: |
+        echo "❌ 某些检查失败，请检查日志"
+
+    - name: Send Slack notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
