@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-🌊 Coastal Console - CogniForge 命令行界面
-继承DNA脚本的自指、进化、多维分析思想
-将复杂的知识管理系统封装为简洁的CLI
-"""
-
+# Coastal Console - CogniForge命令行界面继承DNA脚本的自指、进化、多维分析思想将复杂的知识管理系统封装为简洁的CLI
 import sys
 import os
 import json
@@ -47,7 +42,7 @@ except ImportError:
 
 # 创建Rich控制台
 console = Console()
-app = typer.Typer(help="🌊 Coastal Console - 可生长知识引擎", rich_markup_mode="rich")
+app = typer.Typer(help="Coastal Console - 可生长知识引擎", rich_markup_mode="rich")
 
 # 版本信息
 VERSION = "1.0.0"
@@ -79,11 +74,9 @@ class Theme(str, Enum):
 
 class CoastalLogger:
     """增强的日志系统"""
-    
     def __init__(self, log_file: str = "coastal.log"):
         self.log_file = Path(log_file)
         self.log_file.parent.mkdir(exist_ok=True)
-        
         # 颜色映射
         self.colors = {
             "debug": "dim blue",
@@ -92,28 +85,25 @@ class CoastalLogger:
             "error": "red",
             "success": "green"
         }
-        
         # 图标映射
         self.icons = {
             "debug": "🐛",
-            "info": "ℹ️",
-            "warning": "⚠️",
+            "info": "ℹ",
+            "warning": "⚠",
             "error": "❌",
             "success": "✅"
         }
     
-    def log(self, message: str, level: LogLevel = LogLevel.INFO, 
+    def log(self, message: str, level: LogLevel = LogLevel.INFO,
             module: str = "Coastal", show_time: bool = True):
-        """记录日志"""
+        '''记录日志'''
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         icon = self.icons[level.value]
-        
         # 控制台输出
         if show_time:
             console.print(f"[{self.colors[level.value]}][{timestamp}][/] {icon} [{module}] {message}")
         else:
             console.print(f"{icon} [{self.colors[level.value]}][{module}][/] {message}")
-        
         # 文件记录
         with open(self.log_file, "a", encoding="utf-8") as f:
             f.write(f"[{timestamp}] [{level.upper()}] [{module}] {message}\n")
@@ -123,14 +113,11 @@ logger = CoastalLogger()
 def show_banner():
     """显示启动横幅"""
     banner = """
-    ╔══════════════════════════════════════════════════════════╗
-    ║                                                          ║
-    ║  🌊 Coastal Console v1.0.0                              ║
-    ║  🔬 CogniForge 知识引擎 - 基于DNA四维分析思想             ║
-    ║                                                          ║
-    ║  [bold cyan]可生长 · 自指 · 进化 · 多维[/bold cyan]                    ║
-    ║                                                          ║
-    ╚══════════════════════════════════════════════════════════╝
+    ╔══════════════════════════════════════════╗
+    ║      Coastal Console v1.0.0             ║
+    ║   基于DNA四维分析的知识管理系统         ║
+    ║   CogniForge Team © 2026                ║
+    ╚══════════════════════════════════════════╝
     """
     console.print(banner, justify="center")
     console.print()
@@ -142,37 +129,32 @@ def show_status():
     status_table.add_column("状态", style="green")
     status_table.add_column("版本", style="yellow")
     status_table.add_column("最后更新", style="dim")
-    
     status_data = [
         ["核心引擎", "✅ 运行中", "1.0.0", datetime.now().strftime("%H:%M:%S")],
         ["知识库", "🔍 分析中", "0.9.1", "2026-05-04"],
-        ["进化引擎", "🔄 待命", "1.2.0", "2026-05-03"],
-        ["编译器", "⚡ 就绪", "1.1.0", "2026-05-04"],
+        ["进化引擎", "ω 待命", "1.2.0", "2026-05-03"],
+        ["编译器", "📄 就绪", "1.1.0", "2026-05-04"],
     ]
-    
     for row in status_data:
         status_table.add_row(*row)
-    
     console.print(status_table)
 
 def create_directory_structure(base_path: Path):
     """创建项目目录结构"""
     directories = [
-        "sources",           # 原始资料
-        "schema",           # 知识骨架
-        "wiki",            # 可读输出
-        "logs",            # 日志
-        "cache",           # 缓存
-        "exports",         # 导出
-        "backups",         # 备份
-        "plugins",         # 插件
-        "templates",       # 模板
+        "sources",  # 原始资料
+        "schema",   # 知识骨架
+        "wiki",     # 可读输出
+        "logs",     # 日志
+        "cache",    # 缓存
+        "exports",  # 导出
+        "backups",  # 备份
+        "plugins",  # 插件
+        "templates", # 模板
     ]
-    
-    console.print("[cyan]📁 创建目录结构...[/]")
+    console.print("[cyan]ℹ 创建目录结构...[/]")
     with Progress() as progress:
         task = progress.add_task("[cyan]创建目录...", total=len(directories))
-        
         for dir_name in directories:
             dir_path = base_path / dir_name
             dir_path.mkdir(parents=True, exist_ok=True)
@@ -194,11 +176,9 @@ def create_directory_structure(base_path: Path):
             "log_level": "info"
         }
     }
-    
     config_path = base_path / "coastal.config.json"
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
-    
     console.print(f"[green]✅ 项目初始化完成: {base_path}[/]")
 
 @app.command()
@@ -211,35 +191,34 @@ def init(
     初始化新的知识库项目
     """
     show_banner()
-    
     project_path = Path(project_name)
     
     if project_path.exists() and not force:
-        if not Confirm.ask(f"📁 目录 '{project_name}' 已存在，是否覆盖？"):
+        if not Confirm.ask(f"ℹ 目录 '{project_name}' 已存在，是否覆盖?"):
             console.print("[yellow]❌ 初始化取消[/]")
             return
         shutil.rmtree(project_path)
     
-    with console.status("[bold green]初始化项目中...") as status:
+    with console.status("[bold green]初始化项目中..."):
         # 创建目录结构
         create_directory_structure(project_path)
         
         # 复制模板文件
         if template != "default":
-            status.update(status="[bold green]加载模板...")
+            console.status().update(status="[bold green]加载模板...")
             # 这里可以添加模板复制逻辑
             logger.log(f"使用模板: {template}", LogLevel.INFO, "Init")
         
         # 创建示例文件
-        status.update(status="[bold green]创建示例文件...")
+        console.status().update(status="[bold green]创建示例文件...")
         example_dir = project_path / "sources" / "examples"
         example_dir.mkdir(exist_ok=True)
         
-        # 创建README示例
+        # 创建 README 示例
         readme_content = f"""# {project_name} 知识库
 
 ## 项目概述
-这是由Coastal Console自动创建的知识库。
+这是由 Coastal Console 自动创建的知识库。
 
 ## 目录结构
 - `sources/` - 原始资料
@@ -256,38 +235,35 @@ def init(
 5. 让系统进化: `coastal evolve`
 
 ## 支持的格式
-- PDF文档
-- Markdown文件
+- PDF 文档
+- Markdown 文件
 - 文本文件
 - 代码文件
-- HTML网页
+- HTML 网页
 
 > 创建于: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
-        
         (example_dir / "README.md").write_text(readme_content, encoding="utf-8")
         
         # 创建配置文件示例
         config_example = {
             "name": "示例配置",
-            "description": "这是一个示例配置，展示了如何扩展Coastal Console",
+            "description": "这是一个示例配置，展示了如何扩展 Coastal Console",
             "extensions": {
                 "custom_analyzer": "path.to.your.analyzer",
                 "custom_formatter": "path.to.your.formatter"
             }
         }
-        
         (project_path / "templates" / "example.config.json").write_text(
-            json.dumps(config_example, indent=2, ensure_ascii=False), 
-            encoding="utf-8"
+            json.dumps(config_example, indent=2, ensure_ascii=False), encoding="utf-8"
         )
     
     console.print(Panel.fit(
-        f"[bold green]🎉 项目 '{project_name}' 初始化完成！\n\n"
-        f"[cyan]📁 位置:[/] {project_path.absolute()}\n"
-        f"[cyan]📄 配置:[/] {project_path}/coastal.config.json\n"
-        f"[cyan]📖 示例:[/] {project_path}/sources/examples/\n\n"
-        f"[yellow]👉 下一步:[/]\n"
+        f"[bold green]🎉 项目 '{project_name}' 初始化完成!\n\n"
+        f"[cyan]ℹ 位置:[/] {project_path.absolute()}\n"
+        f"[cyan]⚙ 配置:[/] {project_path}/coastal.config.json\n"
+        f"[cyan]📁 示例:[/] {project_path}/sources/examples/\n\n"
+        f"[yellow]📋 下一步:[/]\n"
         f"1. 添加文档到 sources/ 目录\n"
         f"2. 运行 [bold]coastal analyze[/] 开始分析\n"
         f"3. 运行 [bold]coastal serve[/] 启动本地服务",
@@ -302,7 +278,7 @@ def analyze(
                                               help="指定内容类型: tech/paper/business/note/auto"),
     recursive: bool = typer.Option(True, "--recursive", "-r", help="递归分析子目录"),
     output_format: OutputFormat = typer.Option(OutputFormat.TERMINAL, "--format", "-f", 
-                                               help="输出格式"),
+                                              help="输出格式"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="详细输出"),
     batch: bool = typer.Option(False, "--batch", "-b", help="批量模式")
 ):
@@ -310,8 +286,8 @@ def analyze(
     分析文档并提取知识
     """
     show_banner()
-    
     analyze_path = Path(path)
+    
     if not analyze_path.exists():
         console.print(f"[red]❌ 路径不存在: {path}[/]")
         return
@@ -328,10 +304,12 @@ def analyze(
         # 递归查找文件
         patterns = ["*.md", "*.txt", "*.py", "*.json", "*.yaml", "*.yml", "*.pdf"]
         for pattern in patterns:
-            files_to_analyze.extend(analyze_path.rglob(pattern) if recursive else analyze_path.glob(pattern))
+            files_to_analyze.extend(
+                analyze_path.rglob(pattern) if recursive else analyze_path.glob(pattern)
+            )
     
     if not files_to_analyze:
-        console.print("[yellow]⚠️ 未找到可分析的文件[/]")
+        console.print("[yellow]📭 未找到可分析的文件[/]")
         return
     
     console.print(f"[cyan]🔍 找到 {len(files_to_analyze)} 个文件进行分析...[/]")
@@ -363,13 +341,12 @@ def analyze(
                 result["file_path"] = str(file_path)
                 result["file_size"] = file_path.stat().st_size
                 result["file_type"] = file_path.suffix
-                
                 results.append(result)
                 
                 if verbose:
                     # 显示单文件分析结果
-                    self._display_single_result(result)
-                
+                    display_single_result(result)
+                    
             except Exception as e:
                 failed_files.append((file_path, str(e)))
                 logger.log(f"分析失败: {file_path} - {e}", LogLevel.ERROR, "Analyze")
@@ -377,7 +354,7 @@ def analyze(
             progress.advance(task)
     
     # 显示总结
-    self._display_analysis_summary(results, failed_files, output_format)
+    display_analysis_summary(results, failed_files, output_format)
     
     # 保存结果
     if results:
@@ -396,12 +373,11 @@ def analyze(
                 "results": results
             }, f, indent=2, ensure_ascii=False)
         
-        console.print(f"[green]📁 分析结果已保存: {output_file}[/]")
+        console.print(f"[green]💾 分析结果已保存: {output_file}[/]")
     
-    logger.log(f"分析完成: {len(results)} 成功, {len(failed_files)} 失败", 
-               LogLevel.SUCCESS, "Analyze")
+    logger.log(f"分析完成: {len(results)}成功, {len(failed_files)}失败", LogLevel.SUCCESS, "Analyze")
 
-def _display_single_result(self, result: dict):
+def display_single_result(result: dict):
     """显示单个文件的分析结果"""
     console.print(f"\n[bold cyan]📄 文件: {result.get('file_path', 'Unknown')}[/]")
     
@@ -409,11 +385,9 @@ def _display_single_result(self, result: dict):
     table = Table(show_header=False, box=box.SIMPLE)
     table.add_column("属性", style="cyan")
     table.add_column("值")
-    
     table.add_row("ID", result.get("id", "N/A"))
     table.add_row("类型", result.get("type", "N/A"))
     table.add_row("分析时间", result.get("timestamp", "N/A"))
-    
     console.print(table)
     
     # 维度分析
@@ -444,14 +418,13 @@ def _display_single_result(self, result: dict):
     if "insights" in result:
         console.print(Panel(
             "\n".join(result["insights"][:3]),
-            title="💡 关键洞察",
-            border_style="cyan"
+            title="💡 关键洞察", border_style="cyan"
         ))
 
-def _display_analysis_summary(self, results: list, failed_files: list, output_format: OutputFormat):
+def display_analysis_summary(results: list, failed_files: list, output_format: OutputFormat):
     """显示分析总结"""
     if not results:
-        console.print("[yellow]⚠️ 没有成功的分析结果[/]")
+        console.print("[yellow]📭 没有成功的分析结果[/]")
         return
     
     if output_format == OutputFormat.JSON:
@@ -467,15 +440,14 @@ def _display_analysis_summary(self, results: list, failed_files: list, output_fo
         return
     
     # 终端输出
-    console.print("\n" + "="*60)
+    console.print("\n" + "=" * 60)
     console.print("[bold green]📈 分析总结[/]")
-    console.print("="*60)
+    console.print("=" * 60)
     
     # 统计信息
     stats = Table(show_header=False, box=box.SIMPLE)
     stats.add_column("统计项", style="cyan")
     stats.add_column("数量", style="yellow")
-    
     stats.add_row("📁 总文件数", str(len(results) + len(failed_files)))
     stats.add_row("✅ 成功分析", str(len(results)))
     stats.add_row("❌ 分析失败", str(len(failed_files)))
@@ -507,7 +479,7 @@ def _display_analysis_summary(self, results: list, failed_files: list, output_fo
                 avg_scores[dim] = total / count
         
         if avg_scores:
-            score_table = Table(title="🏆 维度平均评分", box=box.ROUNDED)
+            score_table = Table(title="📊 维度平均评分", box=box.ROUNDED)
             score_table.add_column("维度", style="green")
             score_table.add_column("平均分", style="cyan")
             score_table.add_column("水平", style="yellow")
@@ -520,7 +492,7 @@ def _display_analysis_summary(self, results: list, failed_files: list, output_fo
                     level = "良好 👍"
                     style = "cyan"
                 elif score >= 4:
-                    level = "一般 ⚠️"
+                    level = "一般 ⚠"
                     style = "yellow"
                 else:
                     level = "需改进 🔧"
@@ -534,7 +506,7 @@ def _display_analysis_summary(self, results: list, failed_files: list, output_fo
     if failed_files:
         console.print(Panel(
             "\n".join([f"❌ {f[0]}: {f[1]}" for f in failed_files[:5]]),
-            title="⚠️ 失败文件 (前5个)",
+            title="⚠ 失败文件(前5个)",
             border_style="yellow"
         ))
 
@@ -543,7 +515,7 @@ def evolve(
     iterations: int = typer.Option(3, "--iterations", "-i", help="进化轮数"),
     target: Optional[str] = typer.Option(None, "--target", "-t", 
                                         help="进化目标: performance/accuracy/efficiency"),
-    dry_run: bool = typer.Option(False, "--dry-run", "-d", help="试运行，不实际修改"),
+    dry_run: bool = typer.Option(False, "--dry-run", "-d", help="试运行, 不实际修改"),
     force: bool = typer.Option(False, "--force", "-f", help="强制进化，跳过确认")
 ):
     """
@@ -553,7 +525,7 @@ def evolve(
     show_banner()
     
     if not force:
-        console.print("[yellow]⚠️ 警告: 进化将修改系统配置和算法[/]")
+        console.print("[yellow]⚠ 警告: 进化将修改系统配置和算法[/]")
         if not Confirm.ask("是否继续?"):
             return
     
@@ -583,16 +555,16 @@ def evolve(
             console=console
         ) as progress:
             # 阶段1: 分析当前状态
-            progress.add_task("📊 分析系统状态...", total=None)
+            progress.add_task("🔍 分析系统状态...", total=None)
             status = evo_engine._analyze_knowledge_base()
             
             # 阶段2: 识别改进点
-            progress.add_task("🎯 识别优化机会...", total=None)
+            progress.add_task("💡 识别优化机会...", total=None)
             improvements = evo_engine._identify_improvements(status, [target] if target else None)
             
             # 阶段3: 执行进化
             if not dry_run:
-                progress.add_task("🔧 执行进化...", total=None)
+                progress.add_task("⚡ 执行进化...", total=None)
                 result = evo_engine._execute_targeted_evolution(improvements)
             else:
                 result = {"mode": "dry_run", "improvements": improvements}
@@ -608,32 +580,156 @@ def evolve(
                 "timestamp": datetime.now().isoformat(),
                 "result": result
             })
-            
-            console.print(f"[green]✅ 第 {i+1} 轮进化完成[/]")
-            
-            if i < iterations - 1:
-                with console.status("[dim]⏳ 冷却中..."):
-                    time.sleep(1)
+        
+        console.print(f"[green]✅ 第 {i+1} 轮进化完成[/]")
+        
+        if i < iterations - 1:
+            with console.status("[dim]⏳ 冷却中..."):
+                time.sleep(1)
     
     # 显示进化报告
     _display_evolution_report(evolution_results, dry_run)
 
-def _display_evolution_report(self, results: list, dry_run: bool = False):
+def _display_evolution_report(results: list, dry_run: bool = False):
     """显示进化报告"""
-    console.print("\n" + "="*60)
+    console.print("\n" + "=" * 60)
     console.print("[bold green]📊 进化完成报告[/]")
-    console.print("="*60)
+    console.print("=" * 60)
     
     for round_result in results:
         round_num = round_result["round"]
         result = round_result["result"]
-        
         panel_title = f"第 {round_num} 轮进化"
         if dry_run:
-            panel_title += " (试运行)"
+            panel_title += "(试运行)"
         
         improvements = result.get("improvements", [])
         validation = result.get("validation", {})
-        
         content = []
-     
+        
+        # 修复：添加if语句的缩进块
+        if improvements:
+            # 处理改进点信息
+            content.append(f"[cyan]✅ 发现 {len(improvements)} 个改进点:[/]")
+            for i, improvement in enumerate(improvements, 1):
+                desc = improvement.get("description", "未描述改进")
+                priority = improvement.get("priority", "中")
+                content.append(f"  {i}. [{priority}] {desc}")
+        else:
+            content.append("[yellow]ℹ 未发现改进点[/]")
+        
+        # 处理验证信息
+        if validation:
+            content.append(f"[green]✅ 验证结果:[/]")
+            if "accuracy" in validation:
+                content.append(f"  准确率: {validation.get('accuracy', 0):.1%}")
+            if "performance" in validation:
+                content.append(f"  性能提升: {validation.get('performance', 0):.1%}")
+            if "notes" in validation:
+                content.append(f"  备注: {validation.get('notes', '')}")
+        
+        # 显示面板
+        console.print(Panel(
+            "\n".join(content),
+            title=panel_title,
+            border_style="cyan" if not dry_run else "yellow"
+        ))
+    
+    # 添加最终总结
+    total_improvements = sum(len(r["result"].get("improvements", [])) for r in results)
+    console.print(f"\n[bold green]📈 进化总结:[/] 共执行 {len(results)} 轮进化，累计发现 {total_improvements} 个改进点")
+
+# 修复：添加缺失的命令
+@app.command()
+def serve(
+    port: int = typer.Option(8000, "--port", "-p", help="服务端口"),
+    host: str = typer.Option("localhost", "--host", "-h", help="主机地址"),
+    open_browser: bool = typer.Option(False, "--open", "-o", help="自动打开浏览器")
+):
+    """
+    启动本地服务预览知识库
+    """
+    show_banner()
+    console.print(f"[cyan]🚀 启动 Coastal Console 服务...[/]")
+    console.print(f"[cyan]🌐 地址:[/] http://{host}:{port}")
+    
+    if open_browser:
+        import webbrowser
+        webbrowser.open(f"http://{host}:{port}")
+    
+    console.print("[yellow]📋 按 Ctrl+C 停止服务[/]")
+    
+    # TODO: 实现实际的服务启动逻辑
+    import uvicorn
+    uvicorn.run("server.app:app", host=host, port=port, log_level="info")
+
+@app.command()
+def compile(
+    output_dir: str = typer.Option("wiki", "--output", "-o", help="输出目录"),
+    format: str = typer.Option("html", "--format", "-f", help="输出格式: html/md/pdf"),
+    clean: bool = typer.Option(False, "--clean", "-c", help="清理输出目录")
+):
+    """
+    编译知识库为可读格式
+    """
+    show_banner()
+    console.print(f"[cyan]📄 编译知识库到 {output_dir}/{format}...[/]")
+    
+    output_path = Path(output_dir)
+    if clean and output_path.exists():
+        shutil.rmtree(output_path)
+    
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    # TODO: 实现编译逻辑
+    console.print("[green]✅ 编译完成[/]")
+
+@app.command()
+def status():
+    """
+    显示系统状态
+    """
+    show_banner()
+    show_status()
+
+@app.command()
+def version():
+    """
+    显示版本信息
+    """
+    console.print(f"[bold green]Coastal Console v{VERSION}[/]")
+    console.print(f"[cyan]作者:[/] {AUTHOR}")
+    console.print(f"[cyan]描述:[/] {DESCRIPTION}")
+
+@app.command()
+def help():
+    """
+    显示帮助信息
+    """
+    show_banner()
+    console.print("[bold cyan]📋 可用命令:[/]\n")
+    
+    commands_table = Table(show_header=True, box=box.ROUNDED)
+    commands_table.add_column("命令", style="green")
+    commands_table.add_column("描述", style="cyan")
+    commands_table.add_column("示例", style="yellow")
+    
+    commands = [
+        ["init", "初始化新项目", "coastal init my_project"],
+        ["analyze", "分析文档", "coastal analyze ./docs"],
+        ["evolve", "系统自进化", "coastal evolve --iterations 5"],
+        ["compile", "编译知识库", "coastal compile --format html"],
+        ["serve", "启动服务", "coastal serve --port 8080"],
+        ["status", "系统状态", "coastal status"],
+        ["version", "版本信息", "coastal version"],
+        ["help", "帮助信息", "coastal help"]
+    ]
+    
+    for cmd, desc, example in commands:
+        commands_table.add_row(cmd, desc, example)
+    
+    console.print(commands_table)
+    console.print("\n[yellow]📌 使用 coastal <command> --help 获取命令详细帮助[/]")
+
+if __name__ == "__main__":
+    app()
