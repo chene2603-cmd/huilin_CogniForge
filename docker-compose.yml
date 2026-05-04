@@ -1,0 +1,69 @@
+# 🌊 Coastal Console Docker Compose 配置
+# 版本: 1.0.0
+
+version: '3.8'
+
+services:
+  # 主服务 - Coastal Console
+  coastal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: coastal-console:1.0.0
+    container_name: coastal-console
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - COASTAL_ENV=production
+      - COASTAL_HOST=0.0.0.0
+      - COASTAL_PORT=8000
+      - COASTAL_LOG_LEVEL=info
+      - COASTAL_DATA_DIR=/app/data
+    volumes:
+      - coastal-data:/home/coastal/.coastal
+      - coastal-projects:/home/coastal/coastal-projects
+    networks:
+      - coastal-network
+    healthcheck:
+      test: ["CMD", "coastal", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # 开发环境服务
+  coastal-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: coastal-console:dev
+    container_name: coastal-console-dev
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    environment:
+      - COASTAL_ENV=development
+      - COASTAL_HOST=0.0.0.0
+      - COASTAL_PORT=8000
+      - COASTAL_LOG_LEVEL=debug
+    volumes:
+      - .:/app
+      - coastal-dev-data:/home/coastal/.coastal
+    networks:
+      - coastal-network
+    command: ["coastal", "serve", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# 数据卷
+volumes:
+  coastal-data:
+    driver: local
+  coastal-projects:
+    driver: local
+  coastal-dev-data:
+    driver: local
+
+# 网络
+networks:
+  coastal-network:
+    driver: bridge
