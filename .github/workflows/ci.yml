@@ -12,12 +12,11 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # 代码存在性检查（最小化质量门禁）
   quality:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11']  # 降低矩阵规模，节省时间
+        python-version: ['3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v4
@@ -27,27 +26,26 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install project & minimal deps
+    - name: Install minimal dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements-minimal.txt   # 只装最少依赖，避免复杂冲突
+        pip install -r requirements-minimal.txt
         pip install -e .
 
-    - name: Verify import of coastal CLI
-      run: python -c "from coastal.cli import app; print('✔ CLI module loaded')"
+    - name: Verify Coastal CLI can be imported
+      run: python -c "from coastal.cli import app; print('✔ CLI loaded')"
 
-    - name: Smoke test coastal CLI (allow missing features)
+    - name: Smoke test CLI commands (non-blocking)
       run: |
         coastal --help || true
-        coastal status || echo "ℹ status command not implemented, skipping"
+        coastal status || echo "ℹ status not fully implemented"
 
-    - name: Lint with flake8 (only syntax errors, non-blocking)
+    - name: Lint syntax errors only (non-blocking)
       continue-on-error: true
       run: |
         pip install flake8
-        flake8 coastal --count --select=E9,F63,F7,F82 --show-source --statistics --exit-zero
+        flake8 coastal --count --select=E9,F63,F7,F82 --statistics --exit-zero
 
-  # Docker 构建（不推送，仅验证能打包）
   docker-build:
     runs-on: ubuntu-latest
     needs: quality
@@ -63,11 +61,10 @@ jobs:
         tags: coastal-console:test
         cache-from: type=gha
         cache-to: type=gha,mode=max
-    - name: Quick smoke test on built image
+    - name: Smoke test Docker image
       run: |
-        docker run --rm coastal-console:test coastal --help || echo "ℹ CLI not fully working in container yet"
+        docker run --rm coastal-console:test coastal --help || echo "ℹ container smoke test skipped"
 
-  # 合并后主分支的镜像推送（仅 push 触发，且仅构建可推送的镜像）
   docker-push:
     runs-on: ubuntu-latest
     needs: quality
@@ -89,22 +86,15 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-  # 成功/失败总结
   notify:
     runs-on: ubuntu-latest
     needs: [quality, docker-build, docker-push]
     if: always()
     steps:
-    - name: Pipeline result
+    - name: Pipeline final result
       run: |
-        if [ "${{ needs.quality.result }}" = "success" ]; then
-          echo "✅ Quality checks passed"
+        if [ "${{ needs.quality.result }}" = "success" ] && [ "${{ needs.docker-build.result }}" = "success" ]; then
+          echo "✅ Pipeline passed"
         else
-          echo "❌ Quality checks failed"
+          echo "❌ Pipeline failed – check quality or docker-build"
         fi
-        if [ "${{ needs.docker-build.result }}" = "success" ]; then
-          echo "✅ Docker build succeeded"
-        else
-          echo "❌ Docker build failed"
-        fi
-        # 不再强制要求外部 Slack 通知，避免因 secret 缺失报错
