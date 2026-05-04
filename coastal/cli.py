@@ -237,7 +237,7 @@ def init(
         
         # 创建README示例
         readme_content = f"""# {project_name} 知识库
-
+        
 ## 项目概述
 这是由Coastal Console自动创建的知识库。
 
@@ -278,7 +278,7 @@ def init(
         }
         
         (project_path / "templates" / "example.config.json").write_text(
-            json.dump(config_example, indent=2, ensure_ascii=False), 
+            json.dumps(config_example, indent=2, ensure_ascii=False), 
             encoding="utf-8"
         )
     
@@ -368,7 +368,7 @@ def analyze(
                 
                 if verbose:
                     # 显示单文件分析结果
-                    _display_single_result(result)
+                    self._display_single_result(result)
                 
             except Exception as e:
                 failed_files.append((file_path, str(e)))
@@ -377,7 +377,7 @@ def analyze(
             progress.advance(task)
     
     # 显示总结
-    _display_analysis_summary(results, failed_files, output_format)
+    self._display_analysis_summary(results, failed_files, output_format)
     
     # 保存结果
     if results:
@@ -401,7 +401,7 @@ def analyze(
     logger.log(f"分析完成: {len(results)} 成功, {len(failed_files)} 失败", 
                LogLevel.SUCCESS, "Analyze")
 
-def _display_single_result(result: dict):
+def _display_single_result(self, result: dict):
     """显示单个文件的分析结果"""
     console.print(f"\n[bold cyan]📄 文件: {result.get('file_path', 'Unknown')}[/]")
     
@@ -448,7 +448,7 @@ def _display_single_result(result: dict):
             border_style="cyan"
         ))
 
-def _display_analysis_summary(results: list, failed_files: list, output_format: OutputFormat):
+def _display_analysis_summary(self, results: list, failed_files: list, output_format: OutputFormat):
     """显示分析总结"""
     if not results:
         console.print("[yellow]⚠️ 没有成功的分析结果[/]")
@@ -618,7 +618,7 @@ def evolve(
     # 显示进化报告
     _display_evolution_report(evolution_results, dry_run)
 
-def _display_evolution_report(results: list, dry_run: bool = False):
+def _display_evolution_report(self, results: list, dry_run: bool = False):
     """显示进化报告"""
     console.print("\n" + "="*60)
     console.print("[bold green]📊 进化完成报告[/]")
@@ -637,4 +637,1156 @@ def _display_evolution_report(results: list, dry_run: bool = False):
         
         content = []
         
+        if improvements:
+            content.append("[yellow]🎯 改进点:[/]")
+            for imp in improvements[:5]:  # 只显示前5个
+                content.append(f"  • {imp}")
+            if len(improvements) > 5:
+                content.append(f"  ... 等 {len(improvements)} 个改进点")
         
+        if validation:
+            content.append("\n[green]✅ 验证结果:[/]")
+            for key, value in validation.items():
+                if isinstance(value, (int, float)):
+                    content.append(f"  {key}: {value:.2%}")
+                else:
+                    content.append(f"  {key}: {value}")
+        
+        if not content:
+            content.append("[dim]无详细改进信息[/]")
+        
+        console.print(Panel(
+            "\n".join(content),
+            title=panel_title,
+            border_style="cyan" if not dry_run else "dim"
+        ))
+    
+    # 总体统计
+    if not dry_run and results:
+        final_result = results[-1]["result"]
+        final_validation = final_result.get("validation", {})
+        
+        if final_validation:
+            stats_table = Table(title="📈 进化效果统计", box=box.ROUNDED)
+            stats_table.add_column("指标", style="cyan")
+            stats_table.add_column("进化前", style="dim")
+            stats_table.add_column("进化后", style="green")
+            stats_table.add_column("提升", style="yellow")
+            
+            # 这里可以添加具体的统计数据
+            # 例如: 分析速度、准确率、覆盖率等
+            
+            console.print(stats_table)
+    
+    console.print(f"\n[bold green]🎉 进化完成! 共执行 {len(results)} 轮进化{' (试运行)' if dry_run else ''}[/]")
+    
+    # 保存报告
+    if not dry_run:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_file = Path("evolution_reports") / f"evolution_{timestamp}.json"
+        report_file.parent.mkdir(exist_ok=True)
+        
+        with open(report_file, "w", encoding="utf-8") as f:
+            json.dump({
+                "metadata": {
+                    "total_rounds": len(results),
+                    "completed_at": timestamp,
+                    "mode": "full" if not dry_run else "dry_run"
+                },
+                "results": results
+            }, f, indent=2, ensure_ascii=False)
+        
+        console.print(f"[green]📁 进化报告已保存: {report_file}[/]")
+
+@app.command()
+def self_analyze(
+    detail: bool = typer.Option(False, "--detail", "-d", help="显示详细分析"),
+    export: Optional[Path] = typer.Option(None, "--export", "-e", help="导出分析结果")
+):
+    """
+    系统自我分析 - 继承DNA脚本的自指特性
+    """
+    show_banner()
+    
+    console.print("[bold cyan]🔍 启动自指分析...[/]")
+    console.print("[dim]系统正在分析自身的代码和配置...[/]\n")
+    
+    # 创建分析器
+    analyzer = CogniAnalyzer(name="Coastal Console")
+    
+    with console.status("[bold cyan]分析中...") as status:
+        # 1. 分析系统代码
+        status.update("[bold cyan]分析代码结构...")
+        code_analysis = self._analyze_system_code()
+        
+        # 2. 分析配置文件
+        status.update("[bold cyan]分析配置...")
+        config_analysis = self._analyze_configurations()
+        
+        # 3. 分析知识库状态
+        status.update("[bold cyan]分析知识库...")
+        knowledge_analysis = analyzer.analyze_content("", "系统设计")
+        
+        # 4. 生成综合报告
+        status.update("[bold cyan]生成报告...")
+        report = self._generate_self_analysis_report(
+            code_analysis, 
+            config_analysis, 
+            knowledge_analysis
+        )
+    
+    # 显示分析结果
+    self._display_self_analysis(report, detail)
+    
+    # 导出结果
+    if export:
+        with open(export, "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=2, ensure_ascii=False)
+        console.print(f"[green]📁 自指分析已导出: {export}[/]")
+    
+    # 显示改进建议
+    if "suggestions" in report:
+        console.print("\n[bold yellow]💡 改进建议:[/]")
+        for i, suggestion in enumerate(report["suggestions"][:5], 1):
+            console.print(f"  {i}. {suggestion}")
+
+def _analyze_system_code(self) -> dict:
+    """分析系统代码"""
+    # 获取项目文件结构
+    project_files = []
+    for root, dirs, files in os.walk("."):
+        for file in files:
+            if file.endswith((".py", ".json", ".md", ".txt")):
+                rel_path = os.path.join(root, file)
+                project_files.append({
+                    "path": rel_path,
+                    "size": os.path.getsize(rel_path),
+                    "type": "python" if file.endswith(".py") else "other"
+                })
+    
+    # 计算代码统计
+    code_stats = {
+        "total_files": len(project_files),
+        "python_files": len([f for f in project_files if f["type"] == "python"]),
+        "total_lines": 0,
+        "total_size": sum(f["size"] for f in project_files),
+        "file_structure": self._analyze_directory_structure(".")
+    }
+    
+    return code_stats
+
+def _analyze_configurations(self) -> dict:
+    """分析配置文件"""
+    config_files = [
+        "coastal.config.json",
+        "pyproject.toml",
+        "requirements.txt",
+        ".env",
+        "config.yaml"
+    ]
+    
+    configs = {}
+    for config_file in config_files:
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, "r", encoding="utf-8") as f:
+                    content = f.read()
+                configs[config_file] = {
+                    "exists": True,
+                    "size": len(content),
+                    "lines": content.count("\n") + 1
+                }
+            except:
+                configs[config_file] = {"exists": True, "error": "无法读取"}
+        else:
+            configs[config_file] = {"exists": False}
+    
+    return configs
+
+def _generate_self_analysis_report(self, code_analysis: dict, 
+                                  config_analysis: dict, 
+                                  knowledge_analysis: dict) -> dict:
+    """生成自我分析报告"""
+    report = {
+        "metadata": {
+            "analyzed_at": datetime.now().isoformat(),
+            "system": "Coastal Console",
+            "version": VERSION
+        },
+        "code_analysis": code_analysis,
+        "config_analysis": config_analysis,
+        "knowledge_analysis": knowledge_analysis,
+        "health_score": self._calculate_health_score(code_analysis, config_analysis),
+        "suggestions": self._generate_improvement_suggestions(code_analysis, config_analysis)
+    }
+    
+    return report
+
+def _display_self_analysis(self, report: dict, detail: bool = False):
+    """显示自我分析结果"""
+    console.print("\n" + "="*60)
+    console.print("[bold green]🧬 自指分析报告[/]")
+    console.print("="*60)
+    
+    # 系统信息
+    metadata = report["metadata"]
+    info_table = Table(show_header=False, box=box.SIMPLE)
+    info_table.add_column("属性", style="cyan")
+    info_table.add_column("值", style="white")
+    
+    info_table.add_row("系统名称", metadata["system"])
+    info_table.add_row("版本", metadata["version"])
+    info_table.add_row("分析时间", metadata["analyzed_at"])
+    info_table.add_row("健康度", f"{report['health_score']}/100")
+    
+    console.print(info_table)
+    
+    # 代码分析
+    code_stats = report["code_analysis"]
+    code_table = Table(title="📁 代码结构分析", box=box.ROUNDED)
+    code_table.add_column("指标", style="cyan")
+    code_table.add_column("值", style="yellow")
+    code_table.add_column("状态", style="green")
+    
+    code_table.add_row("总文件数", str(code_stats["total_files"]), 
+                       "✅" if code_stats["total_files"] > 0 else "❌")
+    code_table.add_row("Python文件数", str(code_stats["python_files"]), 
+                       "✅" if code_stats["python_files"] > 0 else "⚠️")
+    code_table.add_row("总大小", f"{code_stats['total_size'] / 1024:.1f} KB", 
+                       "✅" if code_stats["total_size"] < 1024*100 else "⚠️")
+    
+    console.print(code_table)
+    
+    if detail and "file_structure" in code_stats:
+        # 显示文件结构
+        file_tree = Tree("📁 项目结构")
+        self._build_structure_tree(file_tree, code_stats["file_structure"])
+        console.print(file_tree)
+    
+    # 配置分析
+    configs = report["config_analysis"]
+    config_table = Table(title="⚙️ 配置分析", box=box.ROUNDED)
+    config_table.add_column("配置文件", style="cyan")
+    config_table.add_column("状态", style="yellow")
+    config_table.add_column("详情", style="dim")
+    
+    for config_file, info in configs.items():
+        if info.get("exists"):
+            status = "✅ 存在"
+            details = f"{info.get('lines', '?')} 行, {info.get('size', '?')} 字节"
+        else:
+            status = "❌ 缺失"
+            details = "建议创建"
+        
+        config_table.add_row(config_file, status, details)
+    
+    console.print(config_table)
+    
+    # 知识库分析
+    if "knowledge_analysis" in report and report["knowledge_analysis"]:
+        knowledge = report["knowledge_analysis"]
+        if "dimensions" in knowledge:
+            k_table = Table(title="📊 知识库分析", box=box.ROUNDED)
+            k_table.add_column("维度", style="cyan")
+            k_table.add_column("评分", style="yellow")
+            
+            for dim in knowledge.get("dimensions", []):
+                if dim in knowledge:
+                    score = knowledge[dim].get("score", 0)
+                    score_str = f"{score}/10"
+                    if score >= 8:
+                        score_str = f"[green]{score_str}[/]"
+                    elif score >= 5:
+                        score_str = f"[yellow]{score_str}[/]"
+                    else:
+                        score_str = f"[red]{score_str}[/]"
+                    
+                    k_table.add_row(dim, score_str)
+            
+            console.print(k_table)
+
+@app.command()
+def compile(
+    source: Path = typer.Argument(..., help="源文件或目录"),
+    output: Path = typer.Option(Path("output"), "--output", "-o", 
+                               help="输出目录"),
+    format: OutputFormat = typer.Option(OutputFormat.MARKDOWN, "--format", "-f", 
+                                        help="输出格式"),
+    minify: bool = typer.Option(False, "--minify", "-m", help="最小化输出"),
+    compress: bool = typer.Option(False, "--compress", "-c", help="压缩输出")
+):
+    """
+    编译知识库
+    """
+    show_banner()
+    
+    if not source.exists():
+        console.print(f"[red]❌ 源路径不存在: {source}[/]")
+        return
+    
+    output.mkdir(parents=True, exist_ok=True)
+    
+    console.print(f"[cyan]🔧 编译: {source} → {output} ({format.value})[/]")
+    
+    # 初始化编译器和分析器
+    analyzer = CogniAnalyzer()
+    compiler = KnowledgeCompiler(analyzer)
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console
+    ) as progress:
+        # 收集源文件
+        progress.add_task("📁 收集源文件...", total=None)
+        source_files = self._collect_source_files(source)
+        
+        if not source_files:
+            console.print("[yellow]⚠️ 没有找到可编译的文件[/]")
+            return
+        
+        console.print(f"[cyan]找到 {len(source_files)} 个源文件[/]")
+        
+        compiled_count = 0
+        failed_files = []
+        
+        compile_task = progress.add_task("🔨 编译中...", total=len(source_files))
+        
+        for file_path in source_files:
+            try:
+                # 分析文件
+                content = file_path.read_text(encoding="utf-8")
+                analysis = analyzer.analyze_content(content)
+                
+                # 编译为schema
+                schema = compiler.compile_to_schema(analysis)
+                
+                # 根据格式输出
+                if format == OutputFormat.MARKDOWN:
+                    output_content = compiler.compile_to_wiki(schema)
+                    output_file = output / f"{file_path.stem}.md"
+                elif format == OutputFormat.JSON:
+                    output_content = json.dumps(schema, indent=2, ensure_ascii=False)
+                    output_file = output / f"{file_path.stem}.json"
+                elif format == OutputFormat.HTML:
+                    output_content = self._convert_to_html(schema)
+                    output_file = output / f"{file_path.stem}.html"
+                else:
+                    output_content = json.dumps(schema, ensure_ascii=False)
+                    output_file = output / f"{file_path.stem}.txt"
+                
+                # 写入输出
+                output_file.write_text(output_content, encoding="utf-8")
+                compiled_count += 1
+                
+            except Exception as e:
+                failed_files.append((file_path.name, str(e)))
+                logger.log(f"编译失败: {file_path} - {e}", LogLevel.ERROR, "Compile")
+            
+            progress.advance(compile_task)
+    
+    # 显示结果
+    self._display_compile_summary(compiled_count, len(source_files), output, failed_files)
+
+def _display_compile_summary(self, compiled: int, total: int, output_dir: Path, 
+                            failed_files: list):
+    """显示编译总结"""
+    console.print("\n" + "="*60)
+    console.print("[bold green]📦 编译完成[/]")
+    console.print("="*60)
+    
+    summary_table = Table(show_header=False, box=box.ROUNDED)
+    summary_table.add_column("项目", style="cyan")
+    summary_table.add_column("值", style="yellow")
+    
+    summary_table.add_row("📁 总文件数", str(total))
+    summary_table.add_row("✅ 成功编译", str(compiled))
+    summary_table.add_row("❌ 编译失败", str(len(failed_files)))
+    summary_table.add_row("📂 输出目录", str(output_dir.absolute()))
+    summary_table.add_row("🎯 成功率", f"{(compiled/total*100):.1f}%" if total > 0 else "0%")
+    
+    console.print(summary_table)
+    
+    if failed_files:
+        console.print(Panel(
+            "\n".join([f"❌ {name}: {error}" for name, error in failed_files[:3]]),
+            title="⚠️ 失败文件 (前3个)",
+            border_style="yellow"
+        ))
+        if len(failed_files) > 3:
+            console.print(f"[dim]... 还有 {len(failed_files)-3} 个失败文件[/]")
+    
+    console.print(f"\n[green]🎉 编译完成! 查看输出: {output_dir.absolute()}[/]")
+
+@app.command()
+def serve(
+    port: int = typer.Option(8000, "--port", "-p", help="端口号"),
+    host: str = typer.Option("localhost", "--host", "-h", help="主机地址"),
+    theme: Theme = typer.Option(Theme.OCEAN, "--theme", "-t", help="界面主题"),
+    watch: bool = typer.Option(False, "--watch", "-w", help="监视文件变化"),
+    api_only: bool = typer.Option(False, "--api-only", "-a", help="仅启动API")
+):
+    """
+    启动本地服务
+    """
+    show_banner()
+    
+    console.print(f"[cyan]🌐 启动服务: http://{host}:{port}[/]")
+    console.print(f"[dim]主题: {theme.value} | 监视: {watch} | API模式: {api_only}[/]\n")
+    
+    # 检查依赖
+    try:
+        import uvicorn
+        from fastapi import FastAPI, Request
+        from fastapi.responses import HTMLResponse, JSONResponse
+        from fastapi.staticfiles import StaticFiles
+        from fastapi.templating import Jinja2Templates
+    except ImportError:
+        console.print("[yellow]⚠️ 缺少Web依赖，正在安装...[/]")
+        import subprocess
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", 
+                                 "fastapi", "uvicorn", "jinja2"])
+            console.print("[green]✅ 依赖安装完成[/]")
+            import uvicorn
+            from fastapi import FastAPI, Request
+        except:
+            console.print("[red]❌ 安装依赖失败，请手动安装: pip install fastapi uvicorn jinja2[/]")
+            return
+    
+    # 创建应用
+    app_title = f"Coastal Console - 知识引擎 (v{VERSION})"
+    fastapi_app = FastAPI(title=app_title, version=VERSION)
+    
+    # 创建必要的目录
+    static_dir = Path("static")
+    templates_dir = Path("templates")
+    static_dir.mkdir(exist_ok=True)
+    templates_dir.mkdir(exist_ok=True)
+    
+    # 创建默认模板
+    self._create_web_templates(templates_dir, theme)
+    
+    # 挂载静态文件
+    fastapi_app.mount("/static", StaticFiles(directory=static_dir), name="static")
+    templates = Jinja2Templates(directory=str(templates_dir))
+    
+    # API路由
+    @fastapi_app.get("/")
+    async def root(request: Request):
+        """首页"""
+        if api_only:
+            return JSONResponse({
+                "service": "Coastal Console API",
+                "version": VERSION,
+                "endpoints": [
+                    "/api/status",
+                    "/api/knowledge",
+                    "/api/analyze",
+                    "/api/evolve"
+                ]
+            })
+        return templates.TemplateResponse("index.html", {"request": request})
+    
+    @fastapi_app.get("/api/status")
+    async def get_status():
+        """获取状态"""
+        analyzer = CogniAnalyzer()
+        return {
+            "status": "running",
+            "version": VERSION,
+            "system": analyzer.name,
+            "analysis_count": len(analyzer.analysis_history),
+            "evolution_count": analyzer.evolution_count,
+            "uptime": time.time()  # 简化版本
+        }
+    
+    @fastapi_app.post("/api/analyze")
+    async def analyze_text(text: str, content_type: str = "auto"):
+        """分析文本"""
+        analyzer = CogniAnalyzer()
+        result = analyzer.analyze_content(text, content_type)
+        return result
+    
+    @fastapi_app.get("/api/knowledge")
+    async def get_knowledge():
+        """获取知识库"""
+        # 这里可以返回知识库内容
+        return {"knowledge": "正在开发中..."}
+    
+    console.print("[green]✅ FastAPI应用已创建[/]")
+    console.print("[yellow]👉 按 Ctrl+C 停止服务[/]\n")
+    
+    # 启动服务
+    try:
+        config = uvicorn.Config(
+            fastapi_app,
+            host=host,
+            port=port,
+            log_level="info"
+        )
+        server = uvicorn.Server(config)
+        server.run()
+    except KeyboardInterrupt:
+        console.print("\n[yellow]👋 服务已停止[/]")
+    except Exception as e:
+        console.print(f"[red]❌ 服务启动失败: {e}[/]")
+
+@app.command()
+def status():
+    """
+    显示系统状态
+    """
+    show_banner()
+    show_status()
+    
+    # 检查系统健康状态
+    health = self._check_system_health()
+    
+    if health["all_ok"]:
+        console.print(Panel.fit(
+            "[green]✅ 所有系统正常[/]",
+            title="系统健康",
+            border_style="green"
+        ))
+    else:
+        issues = [issue for issue, ok in health.items() if not ok and issue != "all_ok"]
+        console.print(Panel.fit(
+            "\n".join([f"[yellow]⚠️ {issue}[/]" for issue in issues]),
+            title="系统警告",
+            border_style="yellow"
+        ))
+
+@app.command()
+def config(
+    key: Optional[str] = typer.Argument(None, help="配置键"),
+    value: Optional[str] = typer.Argument(None, help="配置值"),
+    list_all: bool = typer.Option(False, "--list", "-l", help="列出所有配置"),
+    get: bool = typer.Option(False, "--get", "-g", help="获取配置值"),
+    set: bool = typer.Option(False, "--set", "-s", help="设置配置值")
+):
+    """
+    管理系统配置
+    """
+    config_file = Path("coastal.config.json")
+    
+    if not config_file.exists():
+        console.print("[red]❌ 配置文件不存在，请先运行 init[/]")
+        return
+    
+    with open(config_file, "r", encoding="utf-8") as f:
+        config = json.load(f)
+    
+    if list_all:
+        # 列出所有配置
+        console.print("[bold cyan]📋 当前配置:[/]")
+        self._display_config(config)
+    elif get and key:
+        # 获取单个配置
+        value = self._get_config_value(config, key.split("."))
+        if value is not None:
+            console.print(f"[cyan]{key}:[/] {value}")
+        else:
+            console.print(f"[red]❌ 配置不存在: {key}[/]")
+    elif set and key and value is not None:
+        # 设置配置
+        try:
+            # 尝试解析值
+            if value.lower() in ("true", "false"):
+                value = value.lower() == "true"
+            elif value.isdigit():
+                value = int(value)
+            elif value.replace('.', '', 1).isdigit():
+                value = float(value)
+            
+            self._set_config_value(config, key.split("."), value)
+            
+            with open(config_file, "w", encoding="utf-8") as f:
+                json.dump(config, f, indent=2, ensure_ascii=False)
+            
+            console.print(f"[green]✅ 配置已更新: {key} = {value}[/]")
+        except Exception as e:
+            console.print(f"[red]❌ 设置失败: {e}[/]")
+    else:
+        # 显示帮助
+        console.print("[yellow]📖 配置管理用法:[/]")
+        console.print("  coastal config --list                  # 列出所有配置")
+        console.print("  coastal config --get <key>             # 获取配置值")
+        console.print("  coastal config --set <key> <value>     # 设置配置值")
+        console.print("  coastal config                          # 显示此帮助")
+
+def _display_config(self, config: dict, prefix: str = ""):
+    """递归显示配置"""
+    for key, value in config.items():
+        full_key = f"{prefix}.{key}" if prefix else key
+        
+        if isinstance(value, dict):
+            console.print(f"[cyan]{full_key}[/]:")
+            self._display_config(value, full_key)
+        elif isinstance(value, list):
+            console.print(f"[cyan]{full_key}[/]:")
+            for i, item in enumerate(value[:5]):  # 只显示前5个
+                console.print(f"  [{i}] {item}")
+            if len(value) > 5:
+                console.print(f"  ... 等 {len(value)} 个项目")
+        else:
+            if isinstance(value, bool):
+                value_str = f"[green]{value}[/]" if value else f"[red]{value}[/]"
+            elif isinstance(value, (int, float)):
+                value_str = f"[yellow]{value}[/]"
+            else:
+                value_str = f"[white]{value}[/]"
+            
+            console.print(f"  [cyan]{full_key}[/]: {value_str}")
+
+def _get_config_value(self, config: dict, keys: list):
+    """递归获取配置值"""
+    if not keys:
+        return config
+    
+    key = keys[0]
+    if key in config:
+        return self._get_config_value(config[key], keys[1:])
+    return None
+
+def _set_config_value(self, config: dict, keys: list, value):
+    """递归设置配置值"""
+    if len(keys) == 1:
+        config[keys[0]] = value
+    else:
+        if keys[0] not in config:
+            config[keys[0]] = {}
+        self._set_config_value(config[keys[0]], keys[1:], value)
+
+def _check_system_health(self) -> dict:
+    """检查系统健康状态"""
+    health = {
+        "all_ok": True
+    }
+    
+    # 检查必要目录
+    required_dirs = ["sources", "schema", "wiki"]
+    for dir_name in required_dirs:
+        dir_path = Path(dir_name)
+        if dir_path.exists():
+            health[f"dir_{dir_name}"] = True
+        else:
+            health[f"dir_{dir_name}"] = False
+            health["all_ok"] = False
+    
+    # 检查配置文件
+    config_file = Path("coastal.config.json")
+    if config_file.exists():
+        health["config_file"] = True
+        try:
+            with open(config_file, "r") as f:
+                json.load(f)
+            health["config_valid"] = True
+        except:
+            health["config_valid"] = False
+            health["all_ok"] = False
+    else:
+        health["config_file"] = False
+        health["config_valid"] = False
+        health["all_ok"] = False
+    
+    # 检查源文件
+    source_files = list(Path("sources").glob("*"))
+    if source_files:
+        health["has_sources"] = True
+    else:
+        health["has_sources"] = False
+        # 这不一定是个错误，只是警告
+        health["all_ok"] = False
+    
+    return health
+
+def _create_web_templates(self, templates_dir: Path, theme: Theme):
+    """创建Web模板"""
+    # 创建主题CSS
+    theme_colors = {
+        "dark": {
+            "bg": "#1a1a1a",
+            "text": "#ffffff",
+            "primary": "#0ea5e9",
+            "secondary": "#3b82f6"
+        },
+        "light": {
+            "bg": "#ffffff",
+            "text": "#1a1a1a",
+            "primary": "#2563eb",
+            "secondary": "#3b82f6"
+        },
+        "ocean": {
+            "bg": "#0f172a",
+            "text": "#e2e8f0",
+            "primary": "#0ea5e9",
+            "secondary": "#06b6d4"
+        },
+        "forest": {
+            "bg": "#0f172a",
+            "text": "#d1fae5",
+            "primary": "#10b981",
+            "secondary": "#059669"
+        }
+    }
+    
+    colors = theme_colors[theme.value]
+    
+    # 创建CSS文件
+    css_content = f"""
+    :root {{
+        --bg-color: {colors['bg']};
+        --text-color: {colors['text']};
+        --primary-color: {colors['primary']};
+        --secondary-color: {colors['secondary']};
+    }}
+    
+    * {{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }}
+    
+    body {{
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+    }}
+    
+    .container {{
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }}
+    
+    .header {{
+        text-align: center;
+        padding: 2rem 0;
+        border-bottom: 2px solid var(--primary-color);
+        margin-bottom: 2rem;
+    }}
+    
+    .header h1 {{
+        color: var(--primary-color);
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }}
+    
+    .header .subtitle {{
+        color: var(--secondary-color);
+        opacity: 0.8;
+    }}
+    
+    .stats-grid {{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }}
+    
+    .stat-card {{
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-color);
+    }}
+    
+    .stat-card h3 {{
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+        opacity: 0.7;
+    }}
+    
+    .stat-card .value {{
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }}
+    
+    .content {{
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }}
+    
+    @media (max-width: 768px) {{
+        .content {{
+            grid-template-columns: 1fr;
+        }}
+    }}
+    
+    .main-content {{
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.5rem;
+        border-radius: 8px;
+    }}
+    
+    .sidebar {{
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.5rem;
+        border-radius: 8px;
+    }}
+    
+    .btn {{
+        display: inline-block;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }}
+    
+    .btn:hover {{
+        opacity: 0.9;
+    }}
+    
+    .btn-secondary {{
+        background: var(--secondary-color);
+    }}
+    """
+    
+    (templates_dir / "static" / "css").mkdir(parents=True, exist_ok=True)
+    (templates_dir / "static" / "css" / "style.css").write_text(css_content, encoding="utf-8")
+    
+    # 创建HTML模板
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title }}</title>
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <header class="header">
+                <h1><i class="fas fa-water"></i> Coastal Console</h1>
+                <p class="subtitle">基于DNA四维分析思想的智能知识引擎</p>
+            </header>
+            
+            <div class="stats-grid" id="stats">
+                <div class="stat-card">
+                    <h3><i class="fas fa-file-alt"></i> 知识文档</h3>
+                    <div class="value" id="doc-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-brain"></i> 分析次数</h3>
+                    <div class="value" id="analysis-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-code-branch"></i> 进化轮数</h3>
+                    <div class="value" id="evolution-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-project-diagram"></i> 关联数量</h3>
+                    <div class="value" id="connection-count">0</div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <main class="main-content">
+                    <h2><i class="fas fa-tachometer-alt"></i> 控制面板</h2>
+                    
+                    <div style="margin: 1.5rem 0;">
+                        <button class="btn" onclick="analyzeText()">
+                            <i class="fas fa-search"></i> 快速分析
+                        </button>
+                        <button class="btn btn-secondary" onclick="viewKnowledge()">
+                            <i class="fas fa-book"></i> 查看知识库
+                        </button>
+                        <button class="btn" onclick="startEvolution()">
+                            <i class="fas fa-sync-alt"></i> 开始进化
+                        </button>
+                    </div>
+                    
+                    <div id="analysis-result" style="margin-top: 2rem;"></div>
+                    
+                    <h3 style="margin-top: 2rem;"><i class="fas fa-history"></i> 最近活动</h3>
+                    <div id="recent-activity"></div>
+                </main>
+                
+                <aside class="sidebar">
+                    <h3><i class="fas fa-info-circle"></i> 系统信息</h3>
+                    <div id="system-info"></div>
+                    
+                    <h3 style="margin-top: 2rem;"><i class="fas fa-bolt"></i> 快速操作</h3>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="uploadDocument()">
+                            <i class="fas fa-upload"></i> 上传文档
+                        </button>
+                        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" onclick="selfAnalyze()">
+                            <i class="fas fa-eye"></i> 自我分析
+                        </button>
+                        <button class="btn" style="width: 100%;" onclick="exportData()">
+                            <i class="fas fa-download"></i> 导出数据
+                        </button>
+                    </div>
+                    
+                    <h3 style="margin-top: 2rem;"><i class="fas fa-question-circle"></i> 帮助</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+                        使用 <code>coastal --help</code> 查看所有命令<br>
+                        查看文档: <a href="#" style="color: var(--primary-color);">https://coastal.example.com</a>
+                    </p>
+                </aside>
+            </div>
+        </div>
+        
+        <script>
+            // 加载系统状态
+            async function loadSystemStatus() {
+                try {
+                    const response = await fetch('/api/status');
+                    const data = await response.json();
+                    
+                    document.getElementById('doc-count').textContent = '...';
+                    document.getElementById('analysis-count').textContent = data.analysis_count || 0;
+                    document.getElementById('evolution-count').textContent = data.evolution_count || 0;
+                    document.getElementById('connection-count').textContent = '...';
+                    
+                    // 显示系统信息
+                    const systemInfo = document.getElementById('system-info');
+                    systemInfo.innerHTML = `
+                        <p><strong>版本:</strong> ${data.version || '1.0.0'}</p>
+                        <p><strong>状态:</strong> <span style="color: #10b981;">● 运行中</span></p>
+                        <p><strong>服务:</strong> ${data.system || 'Coastal Console'}</p>
+                    `;
+                    
+                } catch (error) {
+                    console.error('加载状态失败:', error);
+                }
+            }
+            
+            // 分析文本
+            async function analyzeText() {
+                const text = prompt('请输入要分析的文本:', '');
+                if (!text) return;
+                
+                const resultDiv = document.getElementById('analysis-result');
+                resultDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> 分析中...</p>';
+                
+                try {
+                    const response = await fetch('/api/analyze', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text: text, content_type: 'auto' })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    resultDiv.innerHTML = `
+                        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                            <h4><i class="fas fa-chart-bar"></i> 分析结果</h4>
+                            <p><strong>类型:</strong> ${data.type || '未知'}</p>
+                            <p><strong>深度:</strong> ${data.depth || 0}</p>
+                            <p><strong>时间:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                        </div>
+                    `;
+                    
+                } catch (error) {
+                    resultDiv.innerHTML = '<p style="color: #ef4444;">分析失败</p>';
+                }
+            }
+            
+            // 加载页面时初始化
+            document.addEventListener('DOMContentLoaded', loadSystemStatus);
+            
+            // 其他函数占位
+            function viewKnowledge() { alert('知识库功能开发中...'); }
+            function startEvolution() { alert('进化功能开发中...'); }
+            function uploadDocument() { alert('上传功能开发中...'); }
+            function selfAnalyze() { alert('自我分析功能开发中...'); }
+            function exportData() { alert('导出功能开发中...'); }
+        </script>
+    </body>
+    </html>
+    """
+    
+    (templates_dir / "index.html").write_text(html_content, encoding="utf-8")
+
+@app.command()
+def docs(
+    command: Optional[str] = typer.Argument(None, help="命令名称"),
+    web: bool = typer.Option(False, "--web", "-w", help="在浏览器中打开文档"),
+    markdown: bool = typer.Option(False, "--markdown", "-m", help="输出Markdown格式")
+):
+    """
+    查看文档
+    """
+    if web:
+        # 在浏览器中打开文档
+        import webbrowser
+        webbrowser.open("https://coastal.example.com/docs")
+        return
+    
+    commands_docs = {
+        "init": {
+            "description": "初始化新的知识库项目",
+            "usage": "coastal init <project_name> [--template TEMPLATE] [--force]",
+            "options": {
+                "--template, -t": "模板类型: default/research/engineering",
+                "--force, -f": "强制覆盖已存在项目"
+            },
+            "example": "coastal init my-project --template research"
+        },
+        "analyze": {
+            "description": "分析文档并提取知识",
+            "usage": "coastal analyze <path> [--type TYPE] [--recursive] [--format FORMAT] [--verbose]",
+            "options": {
+                "--type, -t": "内容类型: tech/paper/business/note/auto",
+                "--recursive, -r": "递归分析子目录",
+                "--format, -f": "输出格式: json/markdown/terminal/html/pdf",
+                "--verbose, -v": "详细输出"
+            },
+            "example": "coastal analyze ./docs --type tech --format json"
+        },
+        "evolve": {
+            "description": "执行系统自进化",
+            "usage": "coastal evolve [--iterations ITERATIONS] [--target TARGET] [--dry-run] [--force]",
+            "options": {
+                "--iterations, -i": "进化轮数 (默认: 3)",
+                "--target, -t": "进化目标: performance/accuracy/efficiency",
+                "--dry-run, -d": "试运行，不实际修改",
+                "--force, -f": "强制进化，跳过确认"
+            },
+            "example": "coastal evolve --iterations 5 --target performance"
+        },
+        "compile": {
+            "description": "编译知识库",
+            "usage": "coastal compile <source> [--output OUTPUT] [--format FORMAT] [--minify] [--compress]",
+            "options": {
+                "--output, -o": "输出目录 (默认: ./output)",
+                "--format, -f": "输出格式: json/markdown/terminal/html/pdf",
+                "--minify, -m": "最小化输出",
+                "--compress, -c": "压缩输出"
+            },
+            "example": "coastal compile ./sources --output ./wiki --format markdown"
+        },
+        "serve": {
+            "description": "启动本地Web服务",
+            "usage": "coastal serve [--port PORT] [--host HOST] [--theme THEME] [--watch] [--api-only]",
+            "options": {
+                "--port, -p": "端口号 (默认: 8000)",
+                "--host, -h": "主机地址 (默认: localhost)",
+                "--theme, -t": "界面主题: dark/light/ocean/forest",
+                "--watch, -w": "监视文件变化",
+                "--api-only, -a": "仅启动API，不提供Web界面"
+            },
+            "example": "coastal serve --port 8080 --theme ocean"
+        },
+        "self-analyze": {
+            "description": "系统自我分析",
+            "usage": "coastal self-analyze [--detail] [--export EXPORT]",
+            "options": {
+                "--detail, -d": "显示详细分析结果",
+                "--export, -e": "导出分析结果到文件"
+            },
+            "example": "coastal self-analyze --detail --export analysis.json"
+        },
+        "status": {
+            "description": "显示系统状态",
+            "usage": "coastal status",
+            "example": "coastal status"
+        },
+        "config": {
+            "description": "管理系统配置",
+            "usage": "coastal config [COMMAND] [OPTIONS]",
+            "subcommands": {
+                "--list, -l": "列出所有配置",
+                "--get, -g <key>": "获取配置值",
+                "--set, -s <key> <value>": "设置配置值"
+            },
+            "example": "coastal config --get system.theme"
+        },
+        "docs": {
+            "description": "查看文档",
+            "usage": "coastal docs [COMMAND] [--web] [--markdown]",
+            "options": {
+                "--web, -w": "在浏览器中打开文档",
+                "--markdown, -m": "输出Markdown格式"
+            },
+            "example": "coastal docs analyze"
+        }
+    }
+    
+    if command:
+        # 显示特定命令的文档
+        if command in commands_docs:
+            doc = commands_docs[command]
+            
+            if markdown:
+                # Markdown格式
+                print(f"# `coastal {command}`\n")
+                print(f"**{doc['description']}**\n")
+                print(f"## 使用方法\n```bash\n{doc['usage']}\n```\n")
+                
+                if "options" in doc and doc["options"]:
+                    print("## 选项\n")
+                    for opt, desc in doc["options"].items():
+                        print(f"- `{opt}`: {desc}")
+                    print()
+                
+                if "example" in doc:
+                    print(f"## 示例\n```bash\n{doc['example']}\n```")
+            else:
+                # 终端格式
+                console.print(f"\n[bold cyan]coastal {command}[/]")
+                console.print(f"[white]{doc['description']}[/]\n")
+                console.print(f"[yellow]使用方法:[/] {doc['usage']}\n")
+                
+                if "options" in doc and doc["options"]:
+                    console.print("[green]选项:[/]")
+                    for opt, desc in doc["options"].items():
+                        console.print(f"  [cyan]{opt:30}[/] {desc}")
+                    console.print()
+                
+                if "example" in doc:
+                    console.print(f"[green]示例:[/]")
+                    console.print(f"  [dim]$[/] {doc['example']}")
+        else:
+            console.print(f"[red]❌ 未知命令: {command}[/]")
+            console.print("[yellow]可用命令:[/] " + ", ".join(commands_docs.keys()))
+    else:
+        # 显示所有命令
+        if markdown:
+            print("# Coastal Console 文档\n")
+            print("## 命令列表\n")
+            for cmd, doc in commands_docs.items():
+                print(f"### `coastal {cmd}`\n")
+                print(f"{doc['description']}\n")
+                print(f"```bash\n{doc['usage']}\n```\n")
+        else:
+            show_banner()
+            console.print("[bold cyan]📖 命令文档[/]\n")
+            console.print("[yellow]使用方法: coastal <命令> [选项] [参数][/]\n")
+            
+            for cmd, doc in commands_docs.items():
+                console.print(f"[bold cyan]  {cmd:15}[/] {doc['description']}")
+            
+            console.print("\n[yellow]查看具体命令文档:[/] coastal docs <命令>")
+            console.print("[yellow]例如:[/] coastal docs analyze")
+
+def main():
+    """主函数"""
+    try:
+        app()
+    except KeyboardInterrupt:
+        console.print("\n[yellow]👋 再见![/]")
+        sys.exit(0)
+    except Exception as e:
+        logger.log(f"程序错误: {e}", LogLevel.ERROR, "Main")
+        console.print(f"[red]❌ 错误: {e}[/]")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
